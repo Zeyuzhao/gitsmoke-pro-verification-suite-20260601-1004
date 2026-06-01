@@ -2,7 +2,7 @@
 
 A high-performance, full-stack web application template built with Cloudflare Workers, Hono, React, and Vite. This project leverages the Cloudflare ecosystem to provide a seamless developer experience and global scalability.
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Zeyuzhao/gitsmoke-pro-verification-suite-20260601-1004)
 
 ## Overview
 
@@ -99,7 +99,7 @@ Deploying your application to Cloudflare is straightforward.
 
 ### Automatic Deployment
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Zeyuzhao/gitsmoke-pro-verification-suite-20260601-1004)
 
 Cloudflare Pages and Workers will automatically handle the routing for your assets and API. Ensure your `wrangler.jsonc` is configured correctly for your Cloudflare environment.
 
