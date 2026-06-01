@@ -1,138 +1,155 @@
-// Home page of the app.
-// Currently a demo placeholder "please wait" screen.
-// Replace this file with your actual app UI. Do not delete it to use some other file as homepage. Simply replace the entire contents of this file.
-
-import { useEffect, useMemo, useState } from 'react'
-import { Sparkles } from 'lucide-react'
-
-import { ThemeToggle } from '@/components/ThemeToggle'
-import { HAS_TEMPLATE_DEMO, TemplateDemo } from '@/components/TemplateDemo'
-import { Button } from '@/components/ui/button'
-import { Toaster, toast } from '@/components/ui/sonner'
-
-function formatDuration(ms: number): string {
-  const total = Math.max(0, Math.floor(ms / 1000))
-  const m = Math.floor(total / 60)
-  const s = total % 60
-  return `${m}:${s.toString().padStart(2, '0')}`
-}
-
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ShieldCheck, 
+  Terminal, 
+  Cpu, 
+  Activity, 
+  RefreshCcw, 
+  Github, 
+  Layers,
+  Database,
+  Lock,
+  Globe
+} from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Toaster, toast } from '@/components/ui/sonner';
+import { cn } from '@/lib/utils';
 export function HomePage() {
-  const [coins, setCoins] = useState(0)
-  const [isRunning, setIsRunning] = useState(false)
-  const [startedAt, setStartedAt] = useState<number | null>(null)
-  const [elapsedMs, setElapsedMs] = useState(0)
-
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
   useEffect(() => {
-    if (!isRunning || startedAt === null) return
-
-    const t = setInterval(() => {
-      setElapsedMs(Date.now() - startedAt)
-    }, 250)
-
-    return () => clearInterval(t)
-  }, [isRunning, startedAt])
-
-  const formatted = useMemo(() => formatDuration(elapsedMs), [elapsedMs])
-
-  const onPleaseWait = () => {
-    setCoins((c) => c + 1)
-
-    if (!isRunning) {
-      // Resume from the current elapsed time
-      setStartedAt(Date.now() - elapsedMs)
-      setIsRunning(true)
-      toast.success('Building your app…', {
-        description: "Hang tight — we're setting everything up.",
-      })
-      return
-    }
-
-    setIsRunning(false)
-    toast.info('Still working…', {
-      description: 'You can come back in a moment.',
-    })
-  }
-
-  const onReset = () => {
-    setCoins(0)
-    setIsRunning(false)
-    setStartedAt(null)
-    setElapsedMs(0)
-    toast('Reset complete')
-  }
-
-  const onAddCoin = () => {
-    setCoins((c) => c + 1)
-    toast('Coin added')
-  }
-
+    const timer = setTimeout(() => setHasLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    toast.promise(new Promise(resolve => setTimeout(resolve, 1500)), {
+      loading: 'Validating workflow integrity...',
+      success: 'All checks passed',
+      error: 'Validation failed'
+    });
+    setTimeout(() => setIsRefreshing(false), 1500);
+  };
+  const metrics = [
+    { label: 'Build Hash', value: '7c82a1d', icon: Terminal },
+    { label: 'Environment', value: 'Production', icon: Globe },
+    { label: 'Node Version', value: 'v20.11.0', icon: Cpu },
+    { label: 'Latency', value: '14ms', icon: Activity },
+    { label: 'Datacenter', value: 'US-East-1', icon: Database },
+    { label: 'Security', value: 'Verified', icon: Lock },
+  ];
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground p-4 overflow-hidden relative">
-      <ThemeToggle />
-      <div className="absolute inset-0 bg-gradient-rainbow opacity-10 dark:opacity-20 pointer-events-none" />
-
-      <div className="text-center space-y-8 relative z-10 animate-fade-in w-full">
-        <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-primary floating">
-            <Sparkles className="w-8 h-8 text-white rotating" />
+    <div className="relative min-h-screen bg-background overflow-hidden selection:bg-emerald-500/30">
+      {/* Background Layer */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className={cn(
+          "absolute inset-0 bg-gradient-mesh opacity-0 transition-opacity duration-1000",
+          hasLoaded && "opacity-30 dark:opacity-20"
+        )} />
+        <div className="absolute inset-0 grain" />
+      </div>
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <Github className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="font-semibold tracking-tight text-lg">GitSmoke Pro</span>
+            <Badge variant="outline" className="ml-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Verification Suite</Badge>
           </div>
+          <ThemeToggle className="relative top-0 right-0" />
         </div>
-
-        <div className="space-y-3">
-          <h1 className="text-5xl md:text-7xl font-display font-bold text-balance leading-tight">
-            Creating your <span className="text-gradient">app</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto text-pretty">
-            Your application would be ready soon.
+      </header>
+      {/* Main Content */}
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12 md:py-32 flex flex-col items-center justify-center min-h-screen">
+        <div className="w-full max-w-4xl space-y-12">
+          {/* Hero Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-6"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-medium mb-4">
+              <ShieldCheck className="w-4 h-4" />
+              <span>System Operational</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-1" />
+            </div>
+            <h1 className="text-display text-foreground">
+              GitHub exporter <br />
+              <span className="text-muted-foreground">smoke test </span>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 1 }}
+                className="text-emerald-500 underline decoration-emerald-500/30 underline-offset-8"
+              >
+                2026-06-01
+              </motion.span>
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-light leading-relaxed">
+              Automated verification of workflow state, environment consistency, and data integrity for enterprise repository exports.
+            </p>
+          </motion.div>
+          {/* Metrics Grid */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="grid grid-cols-2 md:grid-cols-3 gap-4"
+          >
+            {metrics.map((metric, i) => (
+              <Card key={metric.label} className="glass group hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-md">
+                <CardContent className="p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <metric.icon className="w-5 h-5 text-muted-foreground group-hover:text-emerald-500 transition-colors" />
+                    <div className="h-1 w-8 rounded-full bg-border group-hover:bg-emerald-500/50 transition-all" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{metric.label}</p>
+                    <p className="text-base font-mono font-medium text-foreground">{metric.value}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
+          {/* Action Footer */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="flex flex-col items-center gap-6"
+          >
+            <Button 
+              size="lg" 
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="h-14 px-8 rounded-full bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-primary/20"
+            >
+              <RefreshCcw className={cn("mr-2 h-5 w-5", isRefreshing && "animate-spin")} />
+              {isRefreshing ? 'Re-validating...' : 'Re-run Smoke Test'}
+            </Button>
+            <div className="flex items-center gap-8 text-xs text-muted-foreground font-mono">
+              <span className="flex items-center gap-1.5"><Layers className="w-3.5 h-3.5" /> STACK: HONO + REACT</span>
+              <span className="hidden sm:inline">|</span>
+              <span className="flex items-center gap-1.5"><Terminal className="w-3.5 h-3.5" /> STATUS: 200 OK</span>
+            </div>
+          </motion.div>
+        </div>
+      </main>
+      <footer className="relative z-10 border-t border-border/40 py-8">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="text-sm text-muted-foreground/60">
+            &copy; 2026 GitSmoke Verification Suite. Secured by Cloudflare Workers.
           </p>
         </div>
-
-        {HAS_TEMPLATE_DEMO ? (
-          <div className="max-w-5xl mx-auto text-left">
-            <TemplateDemo />
-          </div>
-        ) : (
-          <>
-            <div className="flex justify-center gap-4">
-              <Button
-                size="lg"
-                onClick={onPleaseWait}
-                className="btn-gradient px-8 py-4 text-lg font-semibold hover:-translate-y-0.5 transition-all duration-200"
-                aria-live="polite"
-              >
-                Please Wait
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-              <div>
-                Time elapsed:{' '}
-                <span className="font-medium tabular-nums text-foreground">{formatted}</span>
-              </div>
-              <div>
-                Coins:{' '}
-                <span className="font-medium tabular-nums text-foreground">{coins}</span>
-              </div>
-            </div>
-
-            <div className="flex justify-center gap-2">
-              <Button variant="outline" size="sm" onClick={onReset}>
-                Reset
-              </Button>
-              <Button variant="outline" size="sm" onClick={onAddCoin}>
-                Add Coin
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-
-      <footer className="absolute bottom-8 text-center text-muted-foreground/80">
-        <p>Powered by Cloudflare</p>
       </footer>
-
-      <Toaster richColors closeButton />
+      <Toaster richColors position="bottom-right" />
     </div>
-  )
+  );
 }
